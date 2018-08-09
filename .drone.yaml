@@ -1,0 +1,39 @@
+pipeline:
+  publish-api-docker-image:
+    image: plugins/docker
+    secrets: [ docker_username, docker_password ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    repo: paralect/ship-site-api
+    tags:
+      - latest
+      - ${DRONE_BRANCH}
+    dockerfile: ./api/Dockerfile
+    context: ./api/
+    when:
+      branch: ["master", "production"]
+      event: [push]
+
+  deploy-app:
+    image: williamyeh/ansible:ubuntu16.04
+    secrets: [ ssh_key, docker_username, docker_password, docker_email ]
+    commands:
+      - mkdir -p ~/.ssh/
+      - echo -n "$SSH_KEY" >> ~/.ssh/id_rsa_app && chmod 600 ~/.ssh/id_rsa_app
+      - cp ./deploy/vars/credentials-template.yml ./deploy/vars/credentials.yml
+      - cd ./deploy && ./bin/drone-deploy-production.sh
+    when:
+      branch: ["master"]
+      event: [push]
+
+  eslint:
+    image: node:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - npm install --silent
+      - npm run lint
+    when:
+      event: [pull_request]
+
+branches: [ master, "*:master" ]
