@@ -1,0 +1,28 @@
+---
+- name: deploy application using docker
+  hosts: app
+  gather_facts: False
+
+  tasks:
+    - name: log into DockerHub
+      docker_login:
+        username: "{{ docker_registry_username }}"
+        password: "{{ docker_registry_password }}"
+        email: "{{ docker_registry_email }}"
+
+    - name: pull docker image
+      docker_image:
+        state: present
+        force: yes
+        name: ivanzharnoff/drone_task:latest
+
+    - name: run docker container
+      docker_container:
+        name: drone_task
+        image: ivanzharnoff/drone_task:latest
+
+        state: started
+        restart_policy: always
+
+        published_ports:
+          - 4000:4000
