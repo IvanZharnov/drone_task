@@ -1,11 +1,10 @@
 pipeline:
-
   publish-docker-image:
     image: plugins/docker
     secrets: [ docker_username, docker_password ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    repo: andrturko/drone_demo
+    repo: IvanZharnov/drone_task
     dockerfile: ./Dockerfile
     context: ./
     when:
