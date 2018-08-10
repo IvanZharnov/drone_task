@@ -4,7 +4,7 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    repo: IvanZharnov/drone_task
+    repo: ivanzharnoff/drone_task
     dockerfile: ./Dockerfile
     context: ./
     when:
